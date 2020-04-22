@@ -191,10 +191,9 @@ public class RCTIJKPlayer extends FrameLayout implements LifecycleEventListener,
     }
 
 
-    public void setSrc(final String uriString, final ReadableMap readableMap, final String userAgent) {
+    public void setSrc(final String uriString, final ReadableMap headers, final ReadableMap playerOptions, final String userAgent) {
         if (uriString == null)
             return;
-
 
         mLoaded = false;
         mStalled = false;
@@ -223,36 +222,47 @@ public class RCTIJKPlayer extends FrameLayout implements LifecycleEventListener,
         }
 
         if (userAgent != null && ijkVideoView != null)
-
             ijkVideoView.setUserAgent(userAgent);
 
-
-        if (readableMap != null) {
-            Map<String, String> headerMap = new HashMap<>();
-            ReadableMapKeySetIterator iterator = readableMap.keySetIterator();
-            StringBuilder headers = new StringBuilder();
+        Map<String, String> headerMap = null;
+        if (headers != null) {
+            ReadableMapKeySetIterator iterator = headers.keySetIterator();
+            StringBuilder str = new StringBuilder();
             while (iterator.hasNextKey()) {
                 String key = iterator.nextKey();
-                ReadableType type = readableMap.getType(key);
+                ReadableType type = headers.getType(key);
                 switch (type) {
                     case String:
-                        headers
+                        str
                                 .append(key)
                                 .append(": ")
-                                .append(readableMap.getString(key))
+                                .append(headers.getString(key))
                                 .append("\r\n");
                         break;
                 }
             }
-            headerMap.put("Headers", headers.toString());
 
+            headerMap = new HashMap<>();
+            headerMap.put("Headers", str.toString());
+        }
+
+        Map<String, Integer> playerOptionsMap = null;
+        if (playerOptions != null) {
+            playerOptionsMap = new HashMap<>();
+            ReadableMapKeySetIterator iterator = playerOptions.keySetIterator();
+            while (iterator.hasNextKey()) {
+                String key = iterator.nextKey();
+                playerOptionsMap.put(key, playerOptions.getInt(key));
+            }
+        }
+
+        if (headers != null || playerOptions != null) {
             mAudioTracks = null;
             mVideoTracks = null;
             mTextTracks = null;
+        }
 
-            ijkVideoView.setVideoPath(uriString, headerMap);
-        } else
-            ijkVideoView.setVideoPath(uriString);
+        ijkVideoView.setVideoPath(uriString, headerMap, playerOptionsMap);
     }
 
 

@@ -44,6 +44,7 @@ public class RCTIJKPlayerManager extends ViewGroupManager<RCTIJKPlayer> {
     public static final String PROP_SRC_HEADERS = "headers";
     public static final String PROP_SRC_URI = "uri";
     public static final String PROP_SRC_USER_AGENT = "userAgent";
+    public static final String PROP_SRC_PLAYER_OPTIONS = "playerOptions";
     public static final String PROP_MUTED = "muted";
     public static final String PROP_VIDEO_PAUSED = "paused";
     public static final String PROP_SEEK = "seek";
@@ -105,8 +106,11 @@ public class RCTIJKPlayerManager extends ViewGroupManager<RCTIJKPlayer> {
         ReadableMap headers = null;
         if (src.hasKey(PROP_SRC_HEADERS))
             headers = src.getMap(PROP_SRC_HEADERS);
+        ReadableMap playerOptions = null;
+        if (src.hasKey(PROP_SRC_PLAYER_OPTIONS))
+            playerOptions = src.getMap(PROP_SRC_PLAYER_OPTIONS);
         String userAgent = src.getString(PROP_SRC_USER_AGENT);
-        mVideoView.setSrc(uri, headers, userAgent);
+        mVideoView.setSrc(uri, headers, playerOptions, userAgent);
     }
 
     @ReactProp(name = PROP_MUTED, defaultBoolean = false)

@@ -69,6 +69,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     // settable by the client
     private Uri mUri;
     private Map<String, String> mHeaders;
+    private Map<String, Integer> mPlayerOptions;
     private String mUserAgent;
 
     // all possible internal states
@@ -445,33 +446,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
      *
      * @param path the path of the video.
      */
-    public void setVideoPath(String path) {
-        setVideoURI(Uri.parse(path));
-    }
-
-    /**
-     * Sets video path.
-     *
-     * @param path the path of the video.
-     */
-    public void setVideoPath(String path, Map<String, String> headers) {
-        setVideoURI(Uri.parse(path), headers);
-    }
-
-    /**
-     * Sets video URI.
-     *
-     * @param uri the URI of the video.
-     */
-    public void setVideoURI(Uri uri) {
-        setVideoURI(uri, null);
-        stopPlayback();
-        initVideoView(getContext());
-
-        openVideo();
-        requestLayout();
-        invalidate();
-
+    public void setVideoPath(String path, Map<String, String> headers, Map<String, Integer> playerOptions) {
+        setVideoURI(Uri.parse(path), headers, playerOptions);
     }
 
     /**
@@ -484,9 +460,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
      *                "android-allow-cross-domain-redirect" as the key and "0" or "1" as the value
      *                to disallow or allow cross domain redirection.
      */
-    private void setVideoURI(Uri uri, Map<String, String> headers) {
+    private void setVideoURI(Uri uri, Map<String, String> headers, Map<String, Integer> playerOptions) {
         mUri = uri;
         mHeaders = headers;
+        mPlayerOptions = playerOptions;
         mSeekWhenPrepared = 0;
         stopPlayback();
         initVideoView(getContext());
@@ -1076,9 +1053,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         //ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 0);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 1);
 
-
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
-
 
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 1);
 
@@ -1088,11 +1063,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         //ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max-fps", mMaxFpsLimit);
 
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "find_stream_info", 1);
-
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "async-init-decoder", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "find_stream_info", 1);
-        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "async-init-decoder", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "sync-av-start", 1);
 
         //ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "loop", 0);
@@ -1103,9 +1075,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-sync", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "accurate-seek", 1);
 
-
-
-            ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "soundtouch", 1);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "soundtouch", 1);
 
         if (mAudioDisabled)
             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "an", 1);
@@ -1120,6 +1090,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         if (mUserAgent != null)
             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "user_agent", mUserAgent);
+        
+        if (mPlayerOptions != null) {
+            for (Map.Entry<String, Integer> e : mPlayerOptions.entrySet()) {
+                Log.w("IJK_SET_OPTIONS", "Set option " + e.getKey() + "=" + e.getValue());
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, e.getKey(), e.getValue());
+            }
+        }
 
         mIjkMediaPlayer = ijkMediaPlayer;
 

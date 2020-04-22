@@ -1,17 +1,23 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { StyleSheet, requireNativeComponent, View, ViewPropTypes,NativeModules, findNodeHandle} from 'react-native';
-import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import {
+  StyleSheet,
+  requireNativeComponent,
+  View,
+  ViewPropTypes,
+  NativeModules,
+  findNodeHandle,
+} from "react-native";
+import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
 
 const styles = StyleSheet.create({
   base: {
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 });
 
 const IJKPlayerModule = NativeModules.IJKPlayerModule;
 export default class IJKPlayer extends Component {
-
   constructor(props) {
     super(props);
   }
@@ -20,25 +26,25 @@ export default class IJKPlayer extends Component {
     this._root.setNativeProps(nativeProps);
   }
 
-  seek = (time,pauseAfterSeek) => {
-    IJKPlayerModule.seek(time,pauseAfterSeek);
+  seek = (time, pauseAfterSeek) => {
+    IJKPlayerModule.seek(time, pauseAfterSeek);
     //this.setNativeProps({ seek: time, pauseAfterSeek: pauseAfterSeek });
   };
 
   setVolume = (volume) => {
-    this.setNativeProps({volume:volume});
-  }
-  setPaused  = (paused) => {
-    this.setNativeProps({paused:paused})
-  }
+    this.setNativeProps({ volume: volume });
+  };
+  setPaused = (paused) => {
+    this.setNativeProps({ paused: paused });
+  };
 
   setMute = (mute) => {
-    this.setNativeProps({mute:mute});
-  }
+    this.setNativeProps({ mute: mute });
+  };
 
   takeSnapshot = async (path) => {
     return await IJKPlayerModule.takeSnapshot(path);
-  }
+  };
 
   setPan = (pan) => {
     let l = 1;
@@ -50,9 +56,9 @@ export default class IJKPlayer extends Component {
       r = 1;
       l = 1 - pan;
     }
-    console.log(l,r);
-    IJKPlayerModule.setPan(l,r)
-  }
+    console.log(l, r);
+    IJKPlayerModule.setPan(l, r);
+  };
 
   snapshot = (snapshotPath) => {
     this.setNativeProps({ snapshotPath });
@@ -65,7 +71,7 @@ export default class IJKPlayer extends Component {
   setEQPreset = (preset) => {
     //IJKPlayerModule.seek(10);
     IJKPlayerModule.setEQPreset(preset);
-  }
+  };
 
   _onLoadStart = (event) => {
     if (this.props.onLoadStart) {
@@ -74,11 +80,9 @@ export default class IJKPlayer extends Component {
   };
 
   _onLoad = (event) => {
-   
     IJKPlayerModule.init();
     if (this.props.onLoad) {
       this.props.onLoad(event.nativeEvent);
-      
     }
   };
 
@@ -89,7 +93,6 @@ export default class IJKPlayer extends Component {
   };
 
   _onProgress = (event) => {
-  
     if (this.props.onProgress) {
       this.props.onProgress(event.nativeEvent);
     }
@@ -120,52 +123,49 @@ export default class IJKPlayer extends Component {
   };
 
   _onTimedText = (event) => {
-    console.log("HERE",event.nativeEvent);
-  if (this.props.onTimedText) {
-    this.props.onTimedText(event.nativeEvent);
-  }
-  }
+    console.log("HERE", event.nativeEvent);
+    if (this.props.onTimedText) {
+      this.props.onTimedText(event.nativeEvent);
+    }
+  };
 
   setTextTrackIndex = (index) => {
-    this.setNativeProps({selectedTextTrack:index})
-
-  }
+    this.setNativeProps({ selectedTextTrack: index });
+  };
 
   setAudioTrackIndex = (index) => {
-    IJKPlayerModule.getSelectedTracks().then(e => console.log(e));
-    console.log(index, 'setting track');
-    this.setNativeProps({selectedAudioTrack:index})
-    
-  }
+    IJKPlayerModule.getSelectedTracks().then((e) => console.log(e));
+    console.log(index, "setting track");
+    this.setNativeProps({ selectedAudioTrack: index });
+  };
 
   deselectTrack = (index) => {
-    this.setNativeProps({deselectTrack:index});
-  }
+    this.setNativeProps({ deselectTrack: index });
+  };
 
   _onPlay = () => {
     if (this.props.onPlay) {
       this.props.onPlay();
     }
-  }
-
-
+  };
 
   render() {
     const source = resolveAssetSource(this.props.source) || {};
-    const { headers, userAgent } = source;
+    const { headers, userAgent, playerOptions } = source;
 
-    let uri = source.uri || '';
+    let uri = source.uri || "";
     if (uri && uri.match(/^\//)) {
       uri = `file://${uri}`;
     }
 
     const nativeProps = Object.assign({}, this.props);
     Object.assign(nativeProps, {
-      style: [ styles.base, nativeProps.style ],
+      style: [styles.base, nativeProps.style],
       src: {
         uri,
         headers,
         userAgent,
+        playerOptions,
       },
       onVideoLoadStart: this._onLoadStart,
       onVideoLoad: this._onLoad,
@@ -176,17 +176,11 @@ export default class IJKPlayer extends Component {
       onVideoEnd: this._onEnd,
       onVideoBuffer: this._onBuffer,
       onTimedText: this._onTimedText,
-      onPlay:this._onPlay
+      onPlay: this._onPlay,
     });
 
-    return (
-      <RCTIJKPlayer
-        ref={this._assignRoot}
-        
-        {...nativeProps} />
-    );
+    return <RCTIJKPlayer ref={this._assignRoot} {...nativeProps} />;
   }
-
 }
 
 IJKPlayer.propTypes = {
@@ -211,7 +205,7 @@ IJKPlayer.propTypes = {
       userAgent: PropTypes.string,
     }),
     // Opaque type returned by require('./video.mp4')
-    PropTypes.number
+    PropTypes.number,
   ]),
   muted: PropTypes.bool,
   volume: PropTypes.number,
@@ -233,7 +227,7 @@ IJKPlayer.propTypes = {
   ...ViewPropTypes,
 };
 
-const RCTIJKPlayer = requireNativeComponent('RCTIJKPlayer', IJKPlayer, {
+const RCTIJKPlayer = requireNativeComponent("RCTIJKPlayer", IJKPlayer, {
   nativeOnly: {
     src: true,
     seek: true,
