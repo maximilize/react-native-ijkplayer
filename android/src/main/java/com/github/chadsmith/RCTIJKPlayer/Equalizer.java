@@ -31,7 +31,6 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
     private int mCurrentAudioSessionId;
     private IMediaPlayer mMediaPlayer;
 
-
     /**
      * Equalizer
      */
@@ -64,10 +63,6 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
     private boolean mLoudnessEnhancerEnabled = false;
     private int mDefaultLoudnessGain = 0;
 
-
-
-
-
     /**
      * Constructor
      *
@@ -76,15 +71,11 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
 
     public Equalizer(Context context) {
         this.context = context;
-
-
     }
-
 
     /**
      * Equalizer
      */
-
 
     public android.media.audiofx.Equalizer initializeEqualizer() {
         if (mEqualizer == null) {
@@ -94,7 +85,6 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
         return mEqualizer;
     }
 
-
     /**
      * Initialize the Equalizer if it has been released and update equalizer preferences if any
      *
@@ -102,10 +92,7 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
      * @param wasSystem Using System Equalizer
      */
 
-
     private void updateEqualizerPrefs(boolean useCustom, boolean wasSystem) {
-
-
         if (mCurrentAudioSessionId == 0) {
             // No equalizer is currently bound. Nothing to do.
             return;
@@ -130,13 +117,11 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
         }
     }
 
-
     /**
      * Bind custom Equalizer to control MediaPlayer Audio Output.
      *
      * @param audioSessionId audioSessionId for current instance of MediaPlayer.
      */
-
 
     private void bindCustomEqualizer(int audioSessionId) {
         mEqualizer = new android.media.audiofx.Equalizer(0, audioSessionId);
@@ -147,7 +132,6 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
         mEqualizer.setEnabled(true);
     }
 
-
     /**
      * Restore Settings from last media playback to new Equalizer session.
      *
@@ -155,7 +139,6 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
      */
 
     public void setEqualizerSettings(ReadableMap eqSettings) {
-
         if (mEqualizerEnabled)
             if (mEqualizer == null) {
                 return;
@@ -177,22 +160,15 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
         boolean invalidate = mEqualizerEnabled != isEnabled || mEqualizerEnabled;
         boolean wasSystem = isUsingSystemEqualizer();
 
-
         mEqualizerEnabled = isEnabled;
         mEqualizerSettings = settings;
 
         if (invalidate) {
             updateEqualizerPrefs(isEnabled, wasSystem);
         }
-
     }
 
-
     public void getEQBandLevels(final Promise promise) {
-
-
-
-
         if (mMediaPlayer != null && mEqualizerEnabled)
             initializeEqualizer();
 
@@ -200,6 +176,7 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
             promise.resolve(null);
             return;
         }
+
         short numberFrequencyBands = mEqualizer.getNumberOfBands();
         List<Short> bandLevels = new ArrayList<>();
         for (short i = 0; i < numberFrequencyBands; i++) {
@@ -217,7 +194,6 @@ public class Equalizer implements OnAudioSessionIdRecieved, IMediaPlayer.OnCompl
      */
 
     public void setEqualizerEnabled(boolean enabled) {
-
         if (mMediaPlayer != null && mEqualizerEnabled)
             initializeEqualizer();
         if (mEqualizer == null) {

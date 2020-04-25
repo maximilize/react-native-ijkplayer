@@ -72,10 +72,8 @@ public final class MeasureHelper {
         //Log.i("@@@@", "onMeasure(" + MeasureSpec.toString(widthMeasureSpec) + ", "
         //        + MeasureSpec.toString(heightMeasureSpec) + ")");
 
-
         int width = View.getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = View.getDefaultSize(mVideoHeight, heightMeasureSpec);
-
 
         float displayAspectRatio = (float) width / (float) height;
 
@@ -88,8 +86,6 @@ public final class MeasureHelper {
         float w;
 
         if (mCurrentAspectRatio == IRenderView.AR_CONTAIN) {
-
-
             if (isWiderThanView) {
                 h = (float) width / videoAspectRatio;
                 w = width;
@@ -106,7 +102,6 @@ public final class MeasureHelper {
                     } else {
                         w = width;
                     }
-
                 } else {
                     w = (float) height * videoAspectRatio;
                     if (w > width) {
@@ -118,9 +113,7 @@ public final class MeasureHelper {
                         h = height;
                     }
                 }
-
             } else {
-
                 if (mVideoWidth > mVideoHeight) {
                     h = (float) width / videoAspectRatio;
                     if (h > height) {
@@ -130,11 +123,8 @@ public final class MeasureHelper {
                     } else {
                         w = width;
                     }
-
                     Log.i("THERE", "THERE");
-
                 } else {
-
                     w = (float) height * videoAspectRatio;
                     if (w > width) {
                         float diff =  w - width;
@@ -144,11 +134,9 @@ public final class MeasureHelper {
                     } else {
                         h = height;
                     }
-
-
                 }
-
             }
+
             width =(int) w;
             height=(int) h;
 
@@ -156,10 +144,8 @@ public final class MeasureHelper {
             Log.i("hhh", String.valueOf(width));
 
         } else if (mCurrentAspectRatio == IRenderView.AR_STRETCH) {
-
             // Stretch video to match parent size
             // no need to do anything, just set width and height of view.
-
         } else if (mCurrentAspectRatio == IRenderView.AR_FILL_HORIZONTAL){
             // Fill Horizontal -- might clip video vertically
 
@@ -170,7 +156,6 @@ public final class MeasureHelper {
             height = (int) h;
 
         } else if (mCurrentAspectRatio == IRenderView.AR_FILL_VERTICAL) {
-
             // Fill Vertical -- might clip video horizontally
 
             w = (float) height * videoAspectRatio;
@@ -183,7 +168,6 @@ public final class MeasureHelper {
             width = mVideoWidth;
             height = mVideoHeight;
         } else if (mCurrentAspectRatio == IRenderView.AR_COVER) {
-
             // Fill the whole screen & keep aspect ratio -- might clip video
 
             if (mVideoWidth > mVideoHeight) {
@@ -194,9 +178,7 @@ public final class MeasureHelper {
                     int h2 = (int)h + h1;
                     h = h2;
                     w = h * videoAspectRatio;
-
                 }
-
             } else {
                 w = (float) height * videoAspectRatio;
                 h = height;
@@ -205,16 +187,12 @@ public final class MeasureHelper {
                     int w2 = (int)w + w1;
                     w = w2;
                     h = w / videoAspectRatio;
-
                 }
-
             }
 
             width = (int) w;
             height = (int) h;
-
         }
-
 
         mMeasuredWidth = width;
         mMeasuredHeight = height;
@@ -235,5 +213,4 @@ public final class MeasureHelper {
     public void setAspectRatio(int aspectRatio) {
         mCurrentAspectRatio = aspectRatio;
     }
-
 }
