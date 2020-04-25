@@ -120,11 +120,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private TextureRenderView renderView = new TextureRenderView(getContext());
 
-
     /**
      * Equalizer Props
      */
-
 
     /** Subtitle rendering widget overlaid on top of the video. */
     //private RenderingWidget mSubtitleWidget;
@@ -150,7 +148,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public IjkVideoView(Context context) {
         super(context);
         initVideoView(context);
-
     }
 
     public IjkVideoView(Context context, AttributeSet attrs) {
@@ -185,9 +182,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         // REMOVED: getHolder().addCallback(mSHCallback);
         // REMOVED: getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        setFocusable(true);
-        setFocusableInTouchMode(true);
-        requestFocus();
+        setFocusable(false);
+        setFocusableInTouchMode(false);
+        // requestFocus();
         // REMOVED: mPendingSubtitleTracks = new Vector<Pair<InputStream, MediaFormat>>();
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
@@ -366,27 +363,18 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     /**
      * Gets audio focus for the current audio session instance.
      */
-
     public void getAudioFocus() {
-
-
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
         am.requestAudioFocus(onAudioFocusChange, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
     }
 
     /**
      * Abandons audio focus from current audio session instance.
      */
-
-
     public void abandonAudioFocus() {
-
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
         am.abandonAudioFocus(onAudioFocusChange);
-
     }
-
 
     /**
      * Track selector
@@ -395,47 +383,35 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
      *                index of stream in IjkStreamMeta which can contain audio, video
      *                and timedtext tracks altogether.
      */
-
-
     public void selectTrack(int trackID) {
-        if (mMediaPlayer != null)
-
-
-
-            Log.d("SETTING_TRACK", String.valueOf(mIjkMediaPlayer.getCurrentPosition()));
-            mIjkMediaPlayer.selectTrack(trackID);
-
-
-
-         mIjkMediaPlayer.seekTo(mIjkMediaPlayer.getCurrentPosition() );
-
+        if (mMediaPlayer == null) return;
+        Log.d("SETTING_TRACK", String.valueOf(mIjkMediaPlayer.getCurrentPosition()));
+        mIjkMediaPlayer.selectTrack(trackID);
+        mIjkMediaPlayer.seekTo(mIjkMediaPlayer.getCurrentPosition() );
     }
 
     public void deSelectTrack(int trackID) {
-        if (mMediaPlayer != null)
-            Log.d("SETTING_TRACK", String.valueOf(trackID));
-            mIjkMediaPlayer.deselectTrack(trackID);
-
-         mIjkMediaPlayer.seekTo(mIjkMediaPlayer.getCurrentPosition());
-
+        if (mMediaPlayer == null) return;
+        Log.d("SETTING_TRACK", String.valueOf(trackID));
+        mIjkMediaPlayer.deselectTrack(trackID);
+        mIjkMediaPlayer.seekTo(mIjkMediaPlayer.getCurrentPosition());
     }
 
 
     public void setVideo(final boolean videoDisabled) {
-        if (mMediaPlayer != null)
-            mVideoDisabled = videoDisabled;
+        if (mMediaPlayer == null) return;
+        mVideoDisabled = videoDisabled;
     }
 
     public void setAudio(final boolean audioDisabled) {
-        if (mMediaPlayer != null)
-            mAudioDisabled = audioDisabled;
+        if (mMediaPlayer == null) return;
+        mAudioDisabled = audioDisabled;
     }
 
 
     AudioManager.OnAudioFocusChangeListener onAudioFocusChange = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-
             Log.i("AUDIO_SESSION_IDDDDDDDD", String.valueOf(mIjkMediaPlayer.getAudioSessionId()));
         }
     };
@@ -479,12 +455,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mMediaPlayer != null) {
             mMediaPlayer.stop();
             mMediaPlayer.release();
-
             mMediaPlayer = null;
             mCurrentState = STATE_IDLE;
             mTargetState = STATE_IDLE;
             abandonAudioFocus();
-
         }
     }
 
@@ -495,20 +469,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             return;
         }
 
-
         // we shouldn't clear the target state, because somebody might have
         // called start() previously
 
         release(false);
-
         getAudioFocus();
-
 
         mCurrentAspectRatio = IRenderView.AR_CONTAIN;
 
-
         try {
-
             mMediaPlayer = createPlayer();
 
             enableBackgroundPlayback(false);
@@ -518,7 +487,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             // a context for the subtitle renderers
             final Context context = getContext();
             // REMOVED: SubtitleController
-
 
             // REMOVED: mAudioSession
             mMediaPlayer.setOnPreparedListener(mPreparedListener);
@@ -565,7 +533,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         }
     }
-
 
     IMediaPlayer.OnVideoSizeChangedListener mSizeChangedListener =
             new IMediaPlayer.OnVideoSizeChangedListener() {
@@ -614,7 +581,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     mRenderView.setVideoSampleAspectRatio(mVideoSarNum, mVideoSarDen);
                     mRenderView.setVideoSize(mVideoWidth, mVideoHeight);
 
-
                     if (!mRenderView.shouldWaitForResize() || mSurfaceWidth == mVideoWidth && mSurfaceHeight == mVideoHeight) {
                         // We didn't actually change the size (it was already at the size
                         // we need), so we won't get a "surface changed" callback, so
@@ -630,8 +596,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
                 if (mTargetState == STATE_PLAYING) {
                     start();
-
-
                 }
             }
         }
@@ -644,7 +608,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     mTargetState = STATE_PLAYBACK_COMPLETED;
                     if (mOnCompletionListener != null) {
                         mOnCompletionListener.onCompletion(mMediaPlayer);
-
                         initVideoView(getContext());
                     }
                 }
@@ -736,7 +699,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             };
 
     private IMediaPlayer.OnSeekCompleteListener mSeekCompleteListener = new IMediaPlayer.OnSeekCompleteListener() {
-
         @Override
         public void onSeekComplete(IMediaPlayer mp) {
             Log.i("TEXT", "HELLOOOOO");
@@ -753,7 +715,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int id;
 
     public void setContext(ThemedReactContext trc, int i) {
-
         reactContext = trc;
         id = i;
         mEventEmitter = reactContext.getJSModule(RCTEventEmitter.class);
@@ -763,32 +724,23 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private onTimedTextAvailable mOnTimedTextAvailable;
 
     public void setOnTimedTextAvailableListener(onTimedTextAvailable mOnTimedText) {
-
         mOnTimedTextAvailable = mOnTimedText;
-
     }
-
 
     private IMediaPlayer.OnTimedTextListener mOnTimedTextListener = new IMediaPlayer.OnTimedTextListener() {
 
 
         @Override
         public void onTimedText(IMediaPlayer mp, IjkTimedText text) {
-
             Log.i("SUBTITLE_LOAD_ED", String.valueOf(text.getText()));
             if (text != null) {
-
                 Log.d("SUBTITLE", text.getText());
                 if (mOnTimedTextAvailable != null)
                     mOnTimedTextAvailable.onTimedText(text.getText());
-
                 //subtitleDisplay.setText(text.getText());
-
             }
         }
-
     };
-
 
     /**
      * Register a callback to be invoked when the media file
@@ -798,7 +750,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
      */
     public void setOnPreparedListener(IMediaPlayer.OnPreparedListener l) {
         mOnPreparedListener = l;
-
     }
 
     /**
@@ -843,7 +794,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mOnBufferingUpdateListener = l;
     }
 
-
     // REMOVED: mSHCallback
     private void bindSurfaceHolder(IMediaPlayer mp, IRenderView.ISurfaceHolder holder) {
         if (mp == null)
@@ -853,7 +803,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mp.setDisplay(null);
             return;
         }
-
 
         holder.bindToMediaPlayer(mp);
     }
@@ -907,7 +856,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         }
     };
 
-
     public void releaseWithoutStop() {
         if (mMediaPlayer != null)
             mMediaPlayer.setDisplay(null);
@@ -928,8 +876,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 mTargetState = STATE_IDLE;
             }
             abandonAudioFocus();
-
-
         }
     }
 
@@ -945,9 +891,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void pause() {
-
         if (isInPlaybackState()) {
-
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.pause();
                 mCurrentState = STATE_PAUSED;
@@ -969,7 +913,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (isInPlaybackState()) {
             return (int) mMediaPlayer.getDuration();
         }
-
         return -1;
     }
 
@@ -994,7 +937,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public Bitmap getBitmap() {
         if (isInPlaybackState())
-
             return mRenderView.getBitmap();
         return null;
     }
@@ -1037,10 +979,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public int getAudioSessionId() {
-
         return mIjkMediaPlayer.getAudioSessionId();
-
-
     }
 
     private int mCurrentAspectRatio = IRenderView.AR_CONTAIN;
@@ -1049,16 +988,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public IjkMediaPlayer createPlayer() {
         IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
+
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-all-videos", 1);
         //ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 0);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 1);
-
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
-
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 1);
-
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
-
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
 
         //ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max-fps", mMaxFpsLimit);
@@ -1085,8 +1021,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "vn", 1);
         }
 
-
-       ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "subtitle", 1);
+        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "subtitle", 0);
 
         if (mUserAgent != null)
             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "user_agent", mUserAgent);
@@ -1111,13 +1046,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mMaxFpsLimit = fps;
     }
 
-
     public void setVolume(float left, float right) {
         if (mIjkMediaPlayer != null)
-
             mIjkMediaPlayer.setVolume(left, right);
-
-
     }
 
     public void setUserAgent(final String userAgent) {
@@ -1125,11 +1056,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public int getSelectedTrack(int trackType) {
-
         return mIjkMediaPlayer.getSelectedTrack(trackType);
-
     }
-
 
     public void enableBackgroundPlayback(final boolean backgroundPlayback) {
         mBackgroundPlayEnabled = backgroundPlayback;
@@ -1137,6 +1065,4 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mIjkMediaPlayer.setKeepInBackground(mBackgroundPlayEnabled);
 
     }
-
-
 }
